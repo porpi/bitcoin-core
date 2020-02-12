@@ -633,6 +633,9 @@ var _default = {
   },
   rescanBlockchain: {
     category: 'wallet',
+    features: {
+      multiwallet: '>=0.16.0'
+    },
     version: '>=0.16.0'
   },
   saveMempool: {

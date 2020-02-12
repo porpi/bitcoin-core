@@ -65,7 +65,8 @@ class Client {
     timeout = 30000,
     username,
     version,
-    wallet
+    wallet,
+    multiWalletVersionCheck = true
   } = {}) {
     if (!_lodash.default.has(networks, network)) {
       throw new Error(`Invalid network name "${network}"`, {
@@ -73,6 +74,7 @@ class Client {
       });
     }
 
+    this.multiWalletVersionCheck = multiWalletVersionCheck;
     this.agentOptions = agentOptions;
     this.auth = (password || username) && {
       pass: password,
@@ -146,7 +148,7 @@ class Client {
     const isBatch = Array.isArray(input);
 
     if (isBatch) {
-      multiwallet = _lodash.default.some(input, command => {
+      multiwallet = !this.multiWalletVersionCheck ? true : _lodash.default.some(input, command => {
         return _lodash.default.get(this.methods[command.method], 'features.multiwallet.supported', false) === true;
       });
       body = input.map((method, index) => this.requester.prepare({
@@ -159,7 +161,7 @@ class Client {
         parameters = parameters[0];
       }
 
-      multiwallet = _lodash.default.get(this.methods[input], 'features.multiwallet.supported', false) === true;
+      multiwallet = !this.multiWalletVersionCheck ? true : _lodash.default.get(this.methods[input], 'features.multiwallet.supported', false) === true;
       body = this.requester.prepare({
         method: input,
         parameters
