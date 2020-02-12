@@ -54,12 +54,14 @@ class Client {
     timeout = 30000,
     username,
     version,
-    wallet
+    wallet,
+    multiWalletVersionCheck = true
   } = {}) {
     if (!_.has(networks, network)) {
       throw new Error(`Invalid network name "${network}"`, { network });
     }
 
+    this.multiWalletVersionCheck = multiWalletVersionCheck;
     this.agentOptions = agentOptions;
     this.auth = (password || username) && { pass: password, user: username };
     this.hasNamedParametersSupport = false;
@@ -126,7 +128,7 @@ class Client {
     const isBatch = Array.isArray(input);
 
     if (isBatch) {
-      multiwallet = _.some(input, command => {
+      multiwallet = !this.multiWalletVersionCheck ? true : _.some(input, command => {
         return _.get(this.methods[command.method], 'features.multiwallet.supported', false) === true;
       });
 
@@ -140,7 +142,7 @@ class Client {
         parameters = parameters[0];
       }
 
-      multiwallet = _.get(this.methods[input], 'features.multiwallet.supported', false) === true;
+      multiwallet = !this.multiWalletVersionCheck ? true : _.get(this.methods[input], 'features.multiwallet.supported', false) === true;
       body = this.requester.prepare({ method: input, parameters });
     }
 
